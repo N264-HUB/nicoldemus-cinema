@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register Forms</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<br><br>
+<div class="container">
+  <h1>Cinemax</h1>
+
+  <h2 id="selected-movie">Selected Movie: None</h2>
+  <h2 id="selected-time">Selected Time: None</h2>
+  <br><br>
+  <h2>Login</h2>
+  <form id="login-form" method="post">
+    <label>Email</label>
+    <input type="email" name="email" required placeholder="nnic5364@gmail.coms">
+    <label>Password</label>
+    <input type="password" name="password" required placeholder="34wrwt63">
+    <button type="submit">Login</button>
+  </form>
+
+  <a href="forgotpassword.html">Forgot Password?</a>
+  <br><br>
+  <a href="register.html">Don't have an account? Register here</a>
+  <br><br>
+  <a href="index.html">Back to Movie Catalog</a>
+</div>
+
+<code>
+<div class="notice">NOTICE: This is a website made for learning purposes and does not represent a real cinema. All information is fictional. Made by NICOLDEMUS</div>
+</code>
+
+<script>
+  async function updateFormAction(event, formId, baseUrl) {
+    event.preventDefault();
+
+    const form = document.getElementById(formId);
+    const email = form.elements['email'].value;
+    const password = form.elements['password'] ? form.elements['password'].value : '';
+    const confirmPassword = form.elements['confirm-password'] ? form.elements['confirm-password'].value : '';
+
+    const movieTitle = getQueryParam('movie');
+    const movieTime = getQueryParam('time');
+
+    let queryParams = `?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+    if (confirmPassword) {
+      queryParams += `&confirm_password=${encodeURIComponent(confirmPassword)}`;
+    }
+    if (movieTitle) {
+      queryParams += `&movie=${encodeURIComponent(movieTitle)}`;
+    }
+    if (movieTime) {
+      queryParams += `&time=${encodeURIComponent(movieTime)}`;
+    }
+
+    const actionUrl = baseUrl + queryParams;
+
+    try {
+      const response = await fetch(actionUrl, {
+        method: 'POST',
+        body: new URLSearchParams(new FormData(form)),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.message) {
+          if (result['transaction_id'] && result['order_id']) {
+            localStorage.setItem('transaction_id', result['transaction_id']);
+            localStorage.setItem('order_id', result['order_id']);
+
+            // Validate step_count
+            const stepCount = await validateStepCount(result['transaction_id'], result['order_id']);
+            if (stepCount !== 0) {
+              alert('Nope! You need to complete the previous steps first. Returning to the home page.');
+              window.location.href = 'index.html';
+            } else {
+              window.location.href = 'tickets.html';
+            }
+          } else {
+            console.error('Transaction ID or Order ID missing in response');
+            alert('Failed to retrieve transaction details.');
+          }
+        } else {
+          alert(result.message || 'Login failed');
+        }
+      } else {
+        alert('Username or password is incorrect.');
+      }
+    } catch (error) {
+      alert('Network error, please try again later.');
+      console.error('Fetch error:', error);
+    }
+  }
+
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  async function validateStepCount(transactionId, orderId) {
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/step_count?transaction_id=${transactionId}&order_id=${orderId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch step count');
+      }
+      const data = await response.json();
+      return data.step_count;
+    } catch (error) {
+      console.error('Error validating step count:', error);
+      return -1;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const resetPasswordForm = document.getElementById('reset-password-form');
+
+    const movieTitle = getQueryParam('movie');
+    const movieTime = getQueryParam('time');
+    if (movieTitle) {
+      document.getElementById('selected-movie').innerHTML = `Selected Movie: <u>${movieTitle}</u>`;
+    }
+    if (movieTime) {
+      document.getElementById('selected-time').innerHTML = `Selected Time: <u>${movieTime}</u>`;
+    }
+
+    loginForm.addEventListener('submit', (event) => updateFormAction(event, 'login-form', 'https://cinemax-b.onrender.com/login'));
+    if (registerForm) {
+      registerForm.addEventListener('submit', (event) => updateFormAction(event, 'register-form', 'https://cinemax-b.onrender.com/register/'));
+    }
+    if (resetPasswordForm) {
+      resetPasswordForm.addEventListener('submit', (event) => updateFormAction(event, 'reset-password-form', 'https://cinemax-b.onrender.com/reset_password/'));
+    }
+  });
+</script>
+</body>
+</html>

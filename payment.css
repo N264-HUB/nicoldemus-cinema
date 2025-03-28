@@ -1,0 +1,147 @@
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #f5f5f5;
+  background-color: #111;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #000;
+  padding: 20px;
+  color: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f5f5f5;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.profile {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.profile img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #f1c40f;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  background-color: #2ecc71;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  border: 2px solid #1a1a1a;
+}
+
+.notice {
+  width: 100%;
+  background-color: #ffcc00;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+main {
+  padding: 20px;
+}
+
+h2 {
+  border-bottom: 2px solid #f5f5f5;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.summary {
+  margin: 20px 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 5px 0;
+}
+
+input[type="text"],
+input[type="number"],
+button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+input[type="text"],
+input[type="number"] {
+  background-color: #333;
+  color: #f5f5f5;
+}
+
+input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+button {
+  background-color: #ffcc00;
+  color: #111;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+button:disabled::after {
+  content: " (Disabled)";
+}
+
+a {
+  color: #ffcc00;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.links-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.message {
+  color: #ffcc00;
+  margin: 10px 0;
+}
+
+.error {
+  color: #f00;
+  font-size: 14px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}

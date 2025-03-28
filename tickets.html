@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket Purchase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tickets.css">
+</head>
+<body>
+
+<div class="profile">
+  <a href="profile.html">
+    <img src="img/User.avif" alt="Profile Picture">
+    <div class="status-indicator"></div>
+  </a>
+</div>
+
+<div class="container">
+  <div class="ticket-list">
+    <h1>Tickets</h1>
+
+    <ul>
+      <li>
+        <strong>Normal Ticket</strong>
+        <p>Price: $69</p>
+        <label for="normal-quantity">Quantity:</label>
+        <input type="number" id="normal-quantity" name="normal-quantity" min="0" value="0" max="3">
+        <button id="normal-button" onclick="addToCart('Normal Ticket', 69, document.getElementById('normal-quantity').value, 'normal-button')">Add to Cart</button>
+      </li>
+      <hr>
+      <li>
+        <strong>Shiny Ticket</strong>
+        <p>Price: $420</p>
+        <label for="shiny-quantity">Quantity:</label>
+        <input type="number" id="shiny-quantity" name="shiny-quantity" min="0" value="0" max="2">
+        <button id="shiny-button" onclick="addToCart('Shiny Ticket', 420, document.getElementById('shiny-quantity').value, 'shiny-button')">Add to Cart</button>
+      </li>
+      <hr>
+      <li>
+        <strong>Legendary Ticket</strong>
+        <p>Price: $42,069</p>
+        <label for="legendary-quantity">Quantity:</label>
+        <input type="number" id="legendary-quantity" name="legendary-quantity" min="0" value="0" max="1">
+        <button id="legendary-button" onclick="addToCart('Legendary Ticket', 42069, document.getElementById('legendary-quantity').value, 'legendary-button')">Add to Cart</button>
+      </li>
+    </ul>
+
+    <button id="continue-button" onclick="continueToCheckout()">Continue</button>
+    <p id="countdown" class="countdown"></p>
+
+    <h2>Cart</h2>
+    <ul id="cart"></ul>
+    <p id="total"></p>
+  </div>
+
+  <div class="links-container">
+    <a href="javascript:void(0);" onclick="window.history.back()" class="link-button">Go Back</a>
+    <a href="javascript:void(0);" onclick="location.reload()" class="link-button">Clear Cart</a>
+  </div>
+</div>
+
+<code>
+  <div class="notice">NOTICE: This is a website made for learning purposes and does not represent a real cinema. All information is fictional.Made by NICOLDEMUS</div>
+</code>
+
+<script>
+  let cart = [];
+  let total = 0;
+  const TIMER_DURATION = 5 * 60 * 1000;
+
+  function addToCart(ticketType, price, quantity, buttonId) {
+    quantity = parseInt(quantity);
+    if (quantity > 0) {
+      cart.push({ ticketType, price, quantity });
+      updateCart();
+      disableButton(buttonId);
+    }
+  }
+
+  function updateCart() {
+    const cartList = document.getElementById('cart');
+    const totalDisplay = document.getElementById('total');
+    cartList.innerHTML = '';
+    total = 0;
+
+    cart.forEach(item => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${item.quantity} x ${item.ticketType} @ $${item.price} each`;
+      cartList.appendChild(listItem);
+      total += item.price * item.quantity;
+    });
+
+    totalDisplay.textContent = `Total: $${total}`;
+  }
+
+  function continueToCheckout() {
+    if (cart.length > 0) {
+      const totalSeats = cart.reduce((sum, item) => sum + item.quantity, 0);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      localStorage.setItem('total', total);
+      localStorage.setItem('totalSeats', totalSeats);
+
+      sendTicketData(totalSeats)
+        .then(() => {
+          window.location.href = 'seats.html';
+        })
+        .catch((error) => {
+          console.error('Error sending ticket data:', error);
+          alert('There was an error processing your request. Please try again.');
+        });
+    } else {
+      alert('Your cart is empty!');
+    }
+  }
+
+  function sendTicketData(totalSeats) {
+    const transaction_id = encodeURIComponent(localStorage.getItem('transaction_id'));
+    const order_id = encodeURIComponent(localStorage.getItem('order_id'));
+    const price = encodeURIComponent(total);
+
+    return fetch(`https://cinemax-b.onrender.com/tickets?num=${totalSeats}&price=${price}&transaction_id=${transaction_id}&order_id=${order_id}`, {
+      method: 'POST',
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.');
+        }
+        return response.json();
+      });
+  }
+
+  function disableButton(buttonId) {
+    const button = document.getElementById(buttonId);
+    button.disabled = true;
+    button.classList.add('disabled');
+  }
+
+  function resetTimer() {
+    const now = new Date().getTime();
+    localStorage.setItem('timerStart', now);
+  }
+
+  function checkTimer() {
+    const timerStart = parseInt(localStorage.getItem('timerStart'), 10);
+    if (isNaN(timerStart)) {
+      resetTimer();
+      return;
+    }
+
+    const now = new Date().getTime();
+    const elapsedTime = now - timerStart;
+
+    if (elapsedTime > TIMER_DURATION) {
+      alert('Timer expired!');
+      window.location.href = 'index.html';
+    } else {
+      updateCountdown(TIMER_DURATION - elapsedTime);
+    }
+  }
+
+  function updateCountdown(remainingTime) {
+    const countdownElement = document.getElementById('countdown');
+    const minutes = Math.floor(remainingTime / 60000);
+    const seconds = Math.floor((remainingTime % 60000) / 1000);
+    countdownElement.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    resetTimer();
+
+    checkTimer();
+
+    setInterval(() => {
+      const remainingTime = TIMER_DURATION - (new Date().getTime() - parseInt(localStorage.getItem('timerStart'), 10));
+      if (remainingTime > 0) {
+        updateCountdown(remainingTime);
+      }
+    }, 1000);
+  });
+</script>
+
+<br>
+
+</body>
+</html>

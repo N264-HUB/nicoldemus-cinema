@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmation</title>
+  <link rel="stylesheet" href="css/receipt.css">
+</head>
+<body>
+<h1>Payment Confirmation</h1>
+<div class="confirmation">
+  <h2>Thank You for Your Purchase!</h2>
+  <p>Your payment has been successfully processed. Below is your confirmation QR code.</p>
+
+  <div class="qr-code">
+    <img src="img/QRR.jpg" alt="QR Code">
+  </div>
+
+  <div class="details">
+    <p><strong>Order Number:</strong> <span id="order-number"></span></p>
+    <p><strong>Transaction ID:</strong> <span id="transaction-id"></span></p>
+    <p><strong>Transaction Date:</strong> <span id="current-date"></span></p>
+    <br>
+    <p><strong>Movie:</strong> <span id="movie-title"></span></p>
+    <p><strong>Time:</strong> <span id="movie-time"></span></p>
+    <p><strong>Seats:</strong> <span id="selected-seats"></span></p>
+    <p><strong>Original Price:</strong> <span id="original-price"></span></p>
+    <p><strong>Discounted Price:</strong> <span id="discounted-price"></span></p>
+    <br>
+    <p id="discount-message"></p>
+  </div>
+
+  <p><u>If you have any questions or need assistance, please contact our support team.</u></p>
+
+  <button class="contact-button">
+  <a href="tel:+254706327259" >Contact Support</a>
+  </button>
+  <button>
+    <a href="index.html">Back to Home</a>
+  </button>
+  <button class="download-button">
+  <a href="img/QRR.jpg" download="QRR_Code.JPG" class="download-button">Download QR Code</a>
+  </button>
+</div>
+
+<code>
+  <div class="notice">NOTICE: This is a website made for learning purposes and does not represent a real cinema. All information is fictional.Made by NICOLDEMUS</div>
+</code>
+
+<script>
+  async function fetchReservationDetails(transaction_id, order_id) {
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/reservation-details?transaction_id=${transaction_id}&order_id=${order_id}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+
+      document.getElementById('order-number').textContent = data.order_id;
+      document.getElementById('transaction-id').textContent = data.transaction_id;
+      document.getElementById('movie-title').textContent = data.movie;
+      document.getElementById('movie-time').textContent = data.reservation_time;
+      document.getElementById('selected-seats').textContent = data.seats;
+      document.getElementById('current-date').textContent = formatDate(new Date(Date.now()));
+
+      // Display prices
+      const originalPrice = data.price;
+      const discountedPrice = data.total_discounted_price;
+      const discountApplied = data.discount_applied;
+      const discountAmount = data.discount_amount;
+
+      if (discountApplied) {
+        document.getElementById('original-price').innerHTML = `<del>$${originalPrice.toFixed(2)}</del>`;
+        document.getElementById('discounted-price').textContent = `$${discountedPrice.toFixed(2)}`;
+        document.getElementById('discount-message').textContent = `You saved ${discountAmount * 100}% with the discount code!`;
+      } else {
+        document.getElementById('original-price').textContent = `$${originalPrice.toFixed(2)}`;
+        document.getElementById('discounted-price').textContent = `$${originalPrice.toFixed(2)}`;
+        document.getElementById('discount-message').textContent = 'No discount applied';
+      }
+      document.getElementById('total-amount').textContent = `$${discountedPrice.toFixed(2)}`;
+    } catch (error) {
+      console.error('Error fetching reservation details:', error);
+    }
+  }
+
+  async function PushPaymentStatus(transaction_id, order_id) {
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/payment-status?transaction_id=${transaction_id}&order_id=${order_id}`, {
+        method: 'POST'
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+    } catch (error) {
+      console.error('Error fetching payment status:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const transaction_id = localStorage.getItem('transaction_id');
+    const order_id = localStorage.getItem('order_id');
+
+    if (transaction_id && order_id) {
+      fetchReservationDetails(transaction_id, order_id);
+    } else {
+      console.error('Transaction ID or Order ID not found in local storage.');
+    }
+
+    PushPaymentStatus(transaction_id, order_id);
+
+    const mailtoLink = document.getElementById('contact-support');
+    mailtoLink.href = `nicodemuskituku88@gmail.com?subject=Support Request&body=Hello%20Nicoldemus%2C%0A%0AI%20need%20assistance%20regarding%20the%20recent%20payment%20with%20Order%20Number%3A%20${encodeURIComponent(order_id)}%20and%20Transaction%20ID%3A%20${encodeURIComponent(transaction_id)}.%0A%0AThank%20you%21`;
+  });
+
+  function formatDate(date) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+</script>
+
+</body>
+</html>

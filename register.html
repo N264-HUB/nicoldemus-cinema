@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<h1>
+  Cinemax
+</h1>
+
+<h2 id="register">Register</h2>
+<form id="register-form" method="post">
+  <label>Email</label>
+  <input type="email" name="email" required>
+  <label>Password</label>
+  <input type="password" name="password" required>
+  <button type="submit">Register</button>
+</form>
+
+<a href="javascript:void(0);" onclick="window.history.back()">Have an account? Login here</a>
+
+<p id="response-message"></p>
+<p id="selected-movie"></p>
+<p id="selected-time"></p>
+
+<code>
+  <div class="notice">NOTICE: This is a website made for learning purposes and does not represent a real cinema. All information is fictional. Made by NICOLDEMUS</div>
+</code>
+
+<script>
+  async function updateFormAction(event, formId, baseUrl) {
+    event.preventDefault();
+
+    const form = document.getElementById(formId);
+    const email = form.elements['email'].value;
+    const password = form.elements['password'].value || '';
+
+    const movieTitle = getQueryParam('movie');
+    const movieTime = getQueryParam('time');
+
+    let queryParams = `?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+    if (movieTitle) {
+      queryParams += `&movie=${encodeURIComponent(movieTitle)}`;
+    }
+    if (movieTime) {
+      queryParams += `&time=${encodeURIComponent(movieTime)}`;
+    }
+
+    const actionUrl = baseUrl + queryParams;
+
+    try {
+      const response = await fetch(actionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(new FormData(form)),
+      });
+
+      const result = await response.json();
+      const messageElement = document.getElementById('response-message');
+
+      if (response.ok) {
+        messageElement.textContent = result.message || 'Success';
+        messageElement.className = 'success';
+        form.reset();
+      } else {
+        messageElement.textContent = result.detail || 'Error occurred';
+        messageElement.className = 'error';
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      const messageElement = document.getElementById('response-message');
+      messageElement.textContent = 'Network error, please try again later.';
+      messageElement.className = 'error';
+    }
+  }
+
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('register-form');
+
+    const movieTitle = getQueryParam('movie');
+    const movieTime = getQueryParam('time');
+    if (movieTitle) {
+      document.getElementById('selected-movie').textContent = `Selected Movie: ${movieTitle}`;
+    }
+    if (movieTime) {
+      document.getElementById('selected-time').textContent = `Selected Time: ${movieTime}`;
+    }
+
+    if (registerForm) {
+      registerForm.addEventListener('submit', (event) => updateFormAction(event, 'register-form', 'https://cinemax-b.onrender.com//register'));
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+body {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  padding: 20px;
+  background-color: #1e1e1e;
+  margin: 0;
+  color: #f7f7f7;
+}
+
+h1 {
+  color: #ffcc00;
+}
+
+.confirmation {
+  border: 1px solid #444;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  max-width: 600px;
+  width: 100%;
+}
+
+.qr-code {
+  margin: 20px 0;
+}
+
+.qr-code img {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  border: 2px solid #ffcc00;
+}
+
+.details {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.details p {
+  margin: 8px 0;
+}
+
+.details strong {
+  color: #ffcc00;
+}
+
+.details span {
+  color: #f7f7f7;
+}
+
+button {
+  background-color: #ffcc00;
+  color: #1e1e1e;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+  text-align: center;
+  text-decoration: none;
+}
+
+button a {
+  color: #1e1e1e;
+  text-decoration: none;
+}
+
+.contact-button {
+  background-color: #28a745;
+}
+
+.contact-button a {
+  color: #fff;
+}
+
+.download-button {
+  background-color: #6E6656;
+}
+
+.download-button a {
+  color: #fff;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .confirmation {
+    padding: 10px;
+  }
+  button {
+    padding: 10px;
+    font-size: 14px;
+    margin: 5px;
+  }
+}
+
+.notice {
+  width: 100%;
+  background-color: #ffcc00;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+}

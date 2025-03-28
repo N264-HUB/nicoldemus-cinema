@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seat Selection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/seats.css">
+</head>
+<body>
+
+<h1>Select Your Seats</h1>
+
+<div class="screen-container">
+  <div class="screen">Screen</div>
+</div>
+
+<div class="profile">
+  <a href="profile.html">
+    <img src="img/User.avif" alt="Profile Picture">
+    <div class="status-indicator"></div>
+  </a>
+</div>
+
+<div class="seat-container">
+  <div class="seat-row">
+    <div class="seat available" data-seat="A1">A1</div>
+    <div class="seat unavailable" data-seat="A2">A2</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="A4">A4</div>
+    <div class="seat unavailable" data-seat="A5">A5</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="A7">A7</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="A8">A8</div>
+    <div class="seat available" data-seat="A9">A9</div>
+    <div class="seat available" data-seat="A10">A10</div>
+  </div>
+  <div class="seat-row">
+    <div class="seat unavailable" data-seat="B1">B1</div>
+    <div class="seat available" data-seat="B2">B2</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="B4">B4</div>
+    <div class="seat unavailable" data-seat="B5">B5</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="B7">B7</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="B8">B8</div>
+    <div class="seat available" data-seat="B9">B9</div>
+    <div class="seat available" data-seat="B10">B10</div>
+  </div>
+  <div class="seat-row">
+    <div class="seat available" data-seat="C1">C1</div>
+    <div class="seat unavailable" data-seat="C2">C2</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="C4">C4</div>
+    <div class="seat unavailable" data-seat="C5">C5</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="C7">C7</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="C8">C8</div>
+    <div class="seat available" data-seat="C9">C9</div>
+    <div class="seat available" data-seat="C10">C10</div>
+  </div>
+
+  <div class="seat-row">
+    <div class="seat available" data-seat="E1">E1</div>
+    <div class="seat available" data-seat="E2">E2</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="E4">E4</div>
+    <div class="seat available" data-seat="E5">E5</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="E7">E7</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="E8">E8</div>
+    <div class="seat available" data-seat="E9">E9</div>
+    <div class="seat available" data-seat="E10">E10</div>
+  </div>
+
+  <!-- Separator -->
+  <div class="separator"></div>
+
+  <!-- Mission Row -->
+  <div class="seat-row mission-row">
+    <div class="seat available" data-seat="F1">F1</div>
+    <div class="seat unavailable" data-seat="F2">F2</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="F4">F4</div>
+    <div class="seat unavailable" data-seat="F5">F5</div>
+    <div class="seat gap"></div>
+    <div class="seat available" data-seat="F7">F7</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="F8">F8</div>
+    <div class="seat available" data-seat="F9">F9</div>
+    <div class="seat available" data-seat="F10">F10</div>
+  </div>
+
+  <!-- VIP Seating -->
+  <div class="seat-row vip-row">
+    <div class="seat unavailable" data-seat="G1">G1</div>
+    <div class="seat available" data-seat="G2">G2</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="G4">G4</div>
+    <div class="seat vip" data-seat="G5">G5</div>
+    <div class="seat gap"></div>
+    <div class="seat vip" data-seat="G7">G7</div>
+    <div class="seat gap"></div>
+    <div class="seat unavailable" data-seat="G8">G8</div>
+    <div class="seat unavailable" data-seat="G9">G9</div>
+    <div class="seat available" data-seat="G10">G10</div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<div class="controls">
+  <p id="selected-seats">Selected Seats: None</p>
+  <p id="seats-remaining">Seats Remaining: <span id="seats-count"></span></p>
+  <button id="continue-button" onclick="proceedToNextStep()" disabled>Continue</button>
+  <p id="countdown" class="countdown"></p>
+</div>
+
+<code>
+  <div class="notice">NOTICE: This is a website made for learning purposes and does not represent a real cinema. All information is fictional. Made by NICOLDEMUS</div>
+</code>
+
+<script>
+  const maxSeats = parseInt(localStorage.getItem('totalSeats'), 10);
+  document.getElementById('seats-count').textContent = maxSeats;
+  let selectedSeats = [];
+
+  document.querySelectorAll('.seat').forEach(seat => {
+    seat.addEventListener('click', () => {
+      if (seat.classList.contains('unavailable') || seat.classList.contains('gap')) return;
+
+      if (seat.classList.contains('selected')) {
+        seat.classList.remove('selected');
+        selectedSeats = selectedSeats.filter(seatNumber => seatNumber !== seat.getAttribute('data-seat'));
+      } else {
+        if (selectedSeats.length >= maxSeats) return;  // Prevent selecting more than allowed
+        seat.classList.add('selected');
+        selectedSeats.push(seat.getAttribute('data-seat'));
+      }
+
+      updateSelectedSeats();
+    });
+  });
+
+  function updateSelectedSeats() {
+    const selectedSeatsDisplay = document.getElementById('selected-seats');
+    const seatsCountDisplay = document.getElementById('seats-count');
+    const continueButton = document.getElementById('continue-button');
+    selectedSeatsDisplay.textContent = `Selected Seats: ${selectedSeats.join(', ') || 'None'}`;
+
+    const seatsRemaining = maxSeats - selectedSeats.length;
+    seatsCountDisplay.textContent = seatsRemaining;
+
+    // Change the color based on seats remaining
+    if (seatsRemaining > 0) {
+      seatsCountDisplay.style.color = 'green';
+    } else {
+      seatsCountDisplay.style.color = 'red';
+    }
+
+    continueButton.disabled = selectedSeats.length !== maxSeats;
+  }
+
+
+  function proceedToNextStep() {
+    if (selectedSeats.length === maxSeats) {
+      const confirmation = confirm(`You have selected the following seats: ${selectedSeats.join(', ')}. Do you want to proceed to payment?`);
+      if (confirmation) {
+        // Mark all selected seats as unavailable
+        selectedSeats.forEach(seatNumber => {
+          const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
+          if (seat) {
+            seat.classList.remove('selected');
+            seat.classList.add('unavailable');
+          }
+        });
+
+        localStorage.setItem('reservedSeats', JSON.stringify(selectedSeats));
+        const transaction_id = encodeURIComponent(localStorage.getItem('transaction_id'));
+        const order_id = encodeURIComponent(localStorage.getItem('order_id'));
+
+        fetch(`https://cinemax-b.onrender.com/seats?seats=${selectedSeats.join(',')}&transaction_id=${transaction_id}&order_id=${order_id}`, {
+          method: 'POST',
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Success:', data);
+
+            window.location.href = 'payment.html';
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      }
+    }
+  }
+
+  function resetTimer() {
+    const now = new Date().getTime();
+    localStorage.setItem('timerStart', now);
+  }
+
+  function checkTimer() {
+    const timerStart = parseInt(localStorage.getItem('timerStart'), 10);
+    if (isNaN(timerStart)) {
+      resetTimer();
+      return;
+    }
+
+    const now = new Date().getTime();
+    const elapsedTime = now - timerStart;
+    const TIMER_DURATION = 5 * 60 * 1000;
+
+    if (elapsedTime > TIMER_DURATION) {
+      alert('Timer expired!');
+      window.location.href = 'index.html';
+    } else {
+      updateCountdown(TIMER_DURATION - elapsedTime);
+    }
+  }
+
+  function updateCountdown(remainingTime) {
+    const countdownElement = document.getElementById('countdown');
+    const minutes = Math.floor(remainingTime / 60000);
+    const seconds = Math.floor((remainingTime % 60000) / 1000);
+    countdownElement.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    checkTimer();
+    setInterval(() => {
+      const remainingTime = 5 * 60 * 1000 - (new Date().getTime() - parseInt(localStorage.getItem('timerStart'), 10));
+      if (remainingTime > 0) {
+        updateCountdown(remainingTime);
+      }
+    }, 1000);
+  });
+</script>
+
+<br>
+<div style="position: absolute; top:85%; left: 50%; transform: translate(-50%, -50%);">
+  <a href="javascript:void(0);" onclick="window.history.back()" style="color: yellow; text-decoration: none;">Go Back</a>
+</div>
+
+</body>
+</html>

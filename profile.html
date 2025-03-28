@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Profile</title>
+  <link rel="stylesheet" href="css/profile.css">
+  
+</head>
+<body>
+<h1>User Profile</h1>
+<script>
+  async function fetchUserProfile() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/profile?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+      if (!response.ok) {
+        throw new Error('User not found or incorrect password');
+      }
+      const data = await response.json();
+
+      document.getElementById('user-info').innerHTML = `
+        <p>Email: ${data.email}</p>
+        <p>Created At: ${data.created_at}</p>
+        <p>ID: ${data.id}</p>
+        <p>Username: ${data.username || 'N/A'}</p>
+        <p>First Name: ${data.first_name || 'N/A'}</p>
+        <p>Last Name: ${data.last_name || 'N/A'}</p>
+        <p>Phone Number: ${data.phone_number || 'N/A'}</p>
+        <p>Email Verified: ${data.is_email_verified ? 'Yes' : 'No'}</p>
+      `;
+    } catch (error) {
+      document.getElementById('user-info').innerHTML = `<p class="message error">${error.message}</p>`;
+    }
+  }
+
+  async function updateUserProfile() {
+    const email = document.getElementById('update-email').value;
+    const password = document.getElementById('update-password').value;
+    const username = document.getElementById('username').value || 'N/A';
+    const first_name = document.getElementById('first-name').value || 'N/A';
+    const last_name = document.getElementById('last-name').value || 'N/A';
+    const phone_number = document.getElementById('phone-number').value || 'N/A';
+    const is_email_verified = document.getElementById('is-email-verified').checked;
+
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/profile?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&username=${encodeURIComponent(username)}&first_name=${encodeURIComponent(first_name)}&last_name=${encodeURIComponent(last_name)}&phone_number=${encodeURIComponent(phone_number)}&is_email_verified=${is_email_verified}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Update failed');
+      }
+      const result = await response.json();
+      document.getElementById('update-message').innerHTML = `<p class="message success">Profile updated successfully!</p>`;
+    } catch (error) {
+      document.getElementById('update-message').innerHTML = `<p class="message error">Error: ${error.message}</p>`;
+    }
+  }
+
+  async function fetchReservations() {
+    const email = document.getElementById('reservation-email').value;
+    const password = document.getElementById('reservation-password').value;
+
+    try {
+      const response = await fetch(`https://cinemax-b.onrender.com/all-user-reservations?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        throw new Error('Reservations not found or incorrect credentials');
+      }
+      const reservations = await response.json();
+
+      let reservationsHTML = '<table><tr><th>Email</th><th>Movie</th><th>Reservation Date</th><th>Reservation Time</th><th>Tickets</th><th>Seats</th><th>Transaction ID</th><th>Order ID</th><th>Price</th><th>Payment Succeeded?</th></tr>';
+      reservations.forEach(reservation => {
+        reservationsHTML += `
+          <tr>
+            <td>${reservation.email}</td>
+            <td>${reservation.movie}</td>
+            <td>${reservation.reservation_date}</td>
+            <td>${reservation.reservation_time}</td>
+            <td>${reservation.tickets}</td>
+            <td>${reservation.seats}</td>
+            <td>${reservation.transaction_id}</td>
+            <td>${reservation.order_id}</td>
+            <td>${reservation.price}</td>
+            <td>${reservation.payment_succeeded ? 'Yes' : 'No'}</td>
+          </tr>
+        `;
+      });
+      reservationsHTML += '</table>';
+      document.getElementById('reservations-info').innerHTML = reservationsHTML;
+    } catch (error) {
+      document.getElementById('reservations-info').innerHTML = `<p class="message error">${error.message}</p>`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('back-button').addEventListener('click', () => {
+      window.history.back();
+    });
+  });
+</script>
+
+<!-- Fetch User Profile -->
+<form action="https://api.web3forms.com/submit" method="POST">         
+  <label for="email">Email:</label>
+  <input type="hidden" name="access_key" value="88c246c8-d915-4d07-b770-232cdd67508d">
+  <input type="text" id="email" name="email" required placeholder="NIC@aa.coms">
+  <br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required placeholder="NIC@aa.coms">
+  <br>
+  <br>
+  <button type="submit">Get Profile</button>
+</form>
+
+<!-- Update User Profile -->
+<form onsubmit="event.preventDefault(); updateUserProfile();">
+  <form action="https://api.web3forms.com/submit" method="POST">    
+  <h2>Update Profile</h2>
+  <label for="update-email">Email:</label>
+  <input type="hidden" name="access_key" value="88c246c8-d915-4d07-b770-232cdd67508d">
+  <input type="text" id="update-email" name="update-email" required placeholder="d@aa.coms">
+  <br>
+  <label for="update-password">Password:</label>
+  <input type="password" id="update-password" name="update-password" required placeholder="d@aa.coms">
+  <br>
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username">
+  <br>
+  <label for="first-name">First Name:</label>
+  <input type="text" id="first-name" name="first-name">
+  <br>
+  <label for="last-name">Last Name:</label>
+  <input type="text" id="last-name" name="last-name">
+  <br>
+  <label for="phone-number">Phone Number:</label>
+  <input type="text" id="phone-number" name="phone-number">
+  <br>
+  <label for="is-email-verified">Email Verified:</label>
+  <input type="checkbox" id="is-email-verified" name="is-email-verified">
+  <br>
+  <button type="submit">Update Profile</button>
+  <p id="update-message"></p>
+</form>
+
+<!-- Fetch Reservations -->
+<form onsubmit="event.preventDefault(); fetchReservations();">
+  <h2>View Reservations</h2>
+  <label for="reservation-email">Email:</label>
+  <input type="text" id="reservation-email" name="reservation-email" required placeholder="d@aa.coms">
+  <br>
+  <label for="reservation-password">Password:</label>
+  <input type="password" id="reservation-password" name="reservation-password" required placeholder="d@aa.coms">
+  <br>
+  <button type="submit">Get Reservations</button>
+</form>
+
+<div id="user-info"></div>
+<br>
+<div id="reservations-info"></div>
+<br>
+
+<button id="back-button">
+  Go back
+</button>
+</body>
+</html>
